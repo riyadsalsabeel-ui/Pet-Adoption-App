@@ -24,7 +24,7 @@ class AnimalForm(forms.ModelForm):
 class AdoptionRequestForm(forms.ModelForm):
     class Meta:
         model = AdoptionRequest
-        fields = ["message"]
+        fields = ["message"] 
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
