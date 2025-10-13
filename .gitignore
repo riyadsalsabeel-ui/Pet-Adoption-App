@@ -1,0 +1,6 @@
+.env
+Dockerfile
+docker-compose.yml
+runserver.err
+runserver.log
+
