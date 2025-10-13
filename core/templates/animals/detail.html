@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<article class="detail">
+  <h2>{{ animal.name }}</h2>
+  {% if animal.image %}<img src="{{ animal.image.url }}" alt="{{ animal.name }}">{% endif %}
+  <ul>
+    <li>Type: {{ animal.type|title }}</li>
+    <li>Age: {{ animal.age }}</li>
+    <li>Status: <strong>{{ animal.status }}</strong></li>
+  </ul>
+  <p>{{ animal.description }}</p>
+
+  {% if confirm_delete %}
+    <form method="post" action="{% url 'core:animal_delete' animal.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="danger">Confirm Delete</button>
+      <a class="btn" href="{% url 'core:animal_detail' animal.pk %}">Cancel</a>
+    </form>
+  {% else %}
+    {% if user.is_authenticated and not user.is_staff %}
+      {% if existing_request %}
+        <p class="status">You already submitted a request for this pet. Current status: {{ existing_request.status }}.</p>
+      {% else %}
+        <a class="btn" href="{% url 'core:request_create' animal.pk %}">Adopt this pet</a>
+      {% endif %}
+      {% if can_manage %}
+        <a class="btn" href="{% url 'core:animal_update' animal.pk %}">Edit</a>
+        <a class="btn danger" href="{% url 'core:animal_detail' animal.pk %}?confirm=1">Delete</a>
+      {% endif %}
+    {% elif user.is_authenticated and user.is_staff %}
+      {% if can_manage %}
+        <a class="btn" href="{% url 'core:animal_update' animal.pk %}">Edit</a>
+        <a class="btn danger" href="{% url 'core:animal_detail' animal.pk %}?confirm=1">Delete</a>
+        <a class="btn" href="{% url 'core:manage_requests' %}">Manage Requests</a>
+      {% endif %}
+    {% else %}
+      <p><a href="{% url 'core:login' %}">Sign in</a> to request adoption.</p>
+    {% endif %}
+  {% endif %}
+</article>
+{% endblock %}

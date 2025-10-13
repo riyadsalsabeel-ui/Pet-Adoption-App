@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-card">
+  <h2>Create your account</h2>
+  <p class="auth-intro">Register to submit adoption requests and track their progress.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Account</button>
+  </form>
+  <p class="auth-footer">
+    Already registered?
+    <a href="{% url 'core:login' %}">Log in</a>
+  </p>
+</section>
+{% endblock %}

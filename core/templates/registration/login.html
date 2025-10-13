@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-card">
+  <h2>Welcome back</h2>
+  <p class="auth-intro">Sign in to manage your adoption activity.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Log In</button>
+  </form>
+  <p class="auth-footer">
+    New here?
+    <a href="{% url 'core:signup' %}">Create an account</a>
+  </p>
+</section>
+{% endblock %}

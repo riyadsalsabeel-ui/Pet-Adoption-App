@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Adoptable Pets{% if filter_type %} · {{ filter_type|title }}{% endif %}</h2>
+
+<form method="get" class="filter">
+  <label for="filter-type">Type</label>
+  <select id="filter-type" name="type">
+    {% for option in type_options %}
+      <option value="{{ option }}" {% if filter_type == option %}selected{% endif %}>
+        {% if option == "all" %}All Pets{% else %}{{ option|title }}{% endif %}
+      </option>
+    {% endfor %}
+  </select>
+  <button type="submit">Apply</button>
+</form>
+
+<div class="grid">
+  {% for a in animals %}
+    <button
+      type="button"
+      class="card"
+      data-animal-card
+      data-animal-id="{{ a.pk }}"
+      data-animal-name="{{ a.name|escape }}"
+      data-animal-type="{{ a.type|escape }}"
+      data-animal-age="{{ a.age }}"
+      data-animal-status="{{ a.status|escape }}"
+      data-animal-description="{{ a.description|default:'Details coming soon.'|escape }}"
+      data-animal-image="{% if a.image %}{{ a.image.url }}{% endif %}"
+      data-request-url="{% url 'core:request_create' a.pk %}"
+      data-requested="{{ a.has_requested|yesno:'true,false' }}"
+      data-request-status="{{ a.request_status|default:''|escape }}"
+    >
+      {% if a.image %}<img src="{{ a.image.url }}" alt="{{ a.name }}">{% endif %}
+      <h3>{{ a.name }}</h3>
+      <p>{{ a.type|title }} | {{ a.age }} yrs</p>
+      <p class="status">{{ a.status }}</p>
+    </button>
+  {% empty %}
+    <p class="empty-state">No pets match your filters right now.</p>
+  {% endfor %}
+</div>
+
+<div class="modal hidden" data-modal-root data-auth="{{ user.is_authenticated|yesno:'true,false' }}" data-staff="{{ user.is_staff|yesno:'true,false' }}">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-animal-name">
+    <button type="button" class="modal-close" data-modal-close aria-label="Close dialog">&times;</button>
+    <div class="modal-header">
+      <h3 id="modal-animal-name" data-modal-name></h3>
+      <p class="status" data-modal-status></p>
+    </div>
+    <div class="modal-body">
+      <div class="modal-figure" data-modal-image-wrapper>
+        <img src="" alt="" data-modal-image>
+      </div>
+      <ul class="modal-meta">
+        <li><strong>Type:</strong> <span data-modal-type></span></li>
+        <li><strong>Age:</strong> <span data-modal-age></span> years</li>
+      </ul>
+      <p data-modal-description></p>
+    </div>
+    <div class="modal-actions">
+      {% if user.is_authenticated and not user.is_staff %}
+        <p class="request-hint hidden" data-request-hint></p>
+        <form method="post" action="" data-request-form class="modal-form">
+          {% csrf_token %}
+          {{ request_form.as_p }}
+          <button type="submit" class="btn" data-adopt-cta>Submit Adoption Request</button>
+        </form>
+      {% elif user.is_authenticated and user.is_staff %}
+        <p class="auth-nudge">Admins manage adoption requests from the <a href="{% url 'core:manage_requests' %}">dashboard</a>.</p>
+      {% else %}
+        <p class="auth-nudge">Please <a href="{% url 'core:login' %}">sign in</a> or <a href="{% url 'core:signup' %}">create an account</a> to adopt.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.querySelector("[data-modal-root]");
+  if (!modal) {
+    return;
+  }
+
+  const body = document.body;
+  const cards = document.querySelectorAll("[data-animal-card]");
+  const closeTargets = modal.querySelectorAll("[data-modal-close]");
+
+  const nameEl = modal.querySelector("[data-modal-name]");
+  const statusEl = modal.querySelector("[data-modal-status]");
+  const typeEl = modal.querySelector("[data-modal-type]");
+  const ageEl = modal.querySelector("[data-modal-age]");
+  const descEl = modal.querySelector("[data-modal-description]");
+  const imageWrapper = modal.querySelector("[data-modal-image-wrapper]");
+  const imageEl = modal.querySelector("[data-modal-image]");
+  const requestForm = modal.querySelector("[data-request-form]");
+  const requestHint = modal.querySelector("[data-request-hint]");
+  const adoptCta = modal.querySelector("[data-adopt-cta]");
+  const isAuth = modal.dataset.auth === "true";
+  const isStaff = modal.dataset.staff === "true";
+
+  const resetForm = () => {
+    if (requestForm) {
+      requestForm.reset();
+    }
+  };
+
+  const openModal = (card) => {
+    nameEl.textContent = card.dataset.animalName;
+    statusEl.textContent = card.dataset.animalStatus;
+    typeEl.textContent = card.dataset.animalType;
+    ageEl.textContent = card.dataset.animalAge;
+    descEl.textContent = card.dataset.animalDescription || "No description provided yet.";
+
+    const imgSrc = card.dataset.animalImage;
+    if (imgSrc) {
+      imageEl.src = imgSrc;
+      imageEl.alt = card.dataset.animalName;
+      imageWrapper.classList.remove("hidden");
+    } else {
+      imageEl.src = "";
+      imageEl.alt = "";
+      imageWrapper.classList.add("hidden");
+    }
+
+    if (isAuth && !isStaff && requestForm) {
+      const hasRequested = card.dataset.requested === "true";
+      const status = card.dataset.requestStatus;
+      requestForm.action = card.dataset.requestUrl;
+      resetForm();
+
+      if (hasRequested) {
+        requestForm.classList.add("hidden");
+        if (adoptCta) {
+          adoptCta.setAttribute("disabled", "disabled");
+        }
+        if (requestHint) {
+          requestHint.textContent = status ? `You already sent a request. Status: ${status}.` : "You already sent a request for this pet.";
+          requestHint.classList.remove("hidden");
+        }
+      } else {
+        requestForm.classList.remove("hidden");
+        if (adoptCta) {
+          adoptCta.removeAttribute("disabled");
+        }
+        if (requestHint) {
+          requestHint.classList.add("hidden");
+          requestHint.textContent = "";
+        }
+      }
+    }
+    if ((!isAuth || isStaff) && requestForm) {
+      requestForm.classList.add("hidden");
+    }
+
+    modal.classList.remove("hidden");
+    body.classList.add("modal-open");
+  };
+
+  const closeModal = () => {
+    modal.classList.add("hidden");
+    body.classList.remove("modal-open");
+  };
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => openModal(card));
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openModal(card);
+      }
+    });
+  });
+
+  closeTargets.forEach((element) => {
+    element.addEventListener("click", closeModal);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+      closeModal();
+    }
+  });
+});
+</script>
+{% endblock %}

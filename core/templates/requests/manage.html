@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Adoption Requests</h2>
+<p class="auth-intro">Review submissions from adopters and update each pet’s status with one click.</p>
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Pet</th>
+        <th>Requester</th>
+        <th>Message</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in requests %}
+        <tr>
+          <td><a href="{% url 'core:animal_detail' req.animal.pk %}">{{ req.animal.name }}</a></td>
+          <td>{{ req.user.username }}</td>
+          <td>{{ req.message|default:"-" }}</td>
+          <td>{{ req.status }}</td>
+          <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            <form method="post" class="inline-actions">
+              {% csrf_token %}
+              <input type="hidden" name="request_id" value="{{ req.pk }}">
+              {% if req.status == "Pending" %}
+                <button class="btn" name="action" value="approve">Approve</button>
+                <button class="btn danger" name="action" value="reject">Reject</button>
+              {% elif req.status == "Approved" %}
+                <button class="btn" name="action" value="reset">Reopen</button>
+              {% else %}
+                <button class="btn" name="action" value="reset">Mark Pending</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td class="empty-state" colspan="6">No adoption requests yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

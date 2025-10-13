@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-card">
+  <h2>Signed out</h2>
+  <p class="auth-intro">You’re signed out. Log back in anytime to manage adoption activity.</p>
+  <div class="auth-actions">
+    <a class="btn" href="{% url 'core:login' %}">Log In Again</a>
+    <a class="btn" href="{% url 'core:home' %}">Return Home</a>
+  </div>
+</section>
+{% endblock %}

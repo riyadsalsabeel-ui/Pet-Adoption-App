@@ -1,0 +1,63 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pet Adoption</title>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-brand">
+    <a class="brand-link" href="{% url 'core:home' %}">
+      <span class="brand-badge" aria-hidden="true">PA</span>
+      <span class="brand-text">
+        <span class="brand-title">Pet</span>
+        <span class="brand-highlight">Adoption</span>
+      </span>
+    </a>
+    <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-navigation">
+      Menu
+    </button>
+  </div>
+  <nav id="primary-navigation" class="nav-links" data-nav-menu>
+    {% if user.is_authenticated %}
+      {% if user.is_staff %}
+        <a href="{% url 'core:manage_requests' %}">Manage Requests</a>
+        <a href="{% url 'core:animal_create' %}">Add Animal</a>
+      {% else %}
+        <a href="{% url 'core:my_requests' %}">My Requests</a>
+      {% endif %}
+      <a href="{% url 'core:logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'core:login' %}">Login</a>
+      <a href="{% url 'core:signup' %}">Sign Up</a>
+    {% endif %}
+  </nav>
+</header>
+<main class="container">
+  {% if messages %}
+    <ul class="messages">
+      {% for m in messages %}<li class="msg {{ m.tags }}">{{ m }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.querySelector("[data-nav-toggle]");
+  const menu = document.querySelector("[data-nav-menu]");
+  if (!toggle || !menu) {
+    return;
+  }
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    menu.classList.toggle("is-open", !expanded);
+    toggle.textContent = expanded ? "Menu" : "Close";
+  });
+});
+</script>
+</body>
+</html>

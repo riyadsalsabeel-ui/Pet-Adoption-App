@@ -1,0 +1,30 @@
+2025-10-13 22:08:09.773 +03 [42452] LOG:  starting PostgreSQL 16.10, compiled by Visual C++ build 1944, 64-bit
+2025-10-13 22:08:09.797 +03 [42452] LOG:  could not bind IPv6 address "::1": Permission denied
+2025-10-13 22:08:09.798 +03 [42452] LOG:  could not bind IPv4 address "127.0.0.1": Permission denied
+2025-10-13 22:08:09.798 +03 [42452] WARNING:  could not create listen socket for "localhost"
+2025-10-13 22:08:09.798 +03 [42452] FATAL:  could not create any TCP/IP sockets
+2025-10-13 22:08:09.803 +03 [42452] LOG:  database system is shut down
+2025-10-13 22:08:48.122 +03 [37016] LOG:  starting PostgreSQL 16.10, compiled by Visual C++ build 1944, 64-bit
+2025-10-13 22:08:48.123 +03 [37016] LOG:  could not bind IPv4 address "127.0.0.1": Permission denied
+2025-10-13 22:08:48.123 +03 [37016] WARNING:  could not create listen socket for "127.0.0.1"
+2025-10-13 22:08:48.123 +03 [37016] FATAL:  could not create any TCP/IP sockets
+2025-10-13 22:08:48.126 +03 [37016] LOG:  database system is shut down
+2025-10-13 22:10:19.037 +03 [5480] LOG:  starting PostgreSQL 16.10, compiled by Visual C++ build 1944, 64-bit
+2025-10-13 22:10:19.038 +03 [5480] LOG:  listening on IPv4 address "127.0.0.1", port 5434
+2025-10-13 22:10:19.103 +03 [30476] LOG:  database system was shut down at 2025-10-13 22:07:40 +03
+2025-10-13 22:10:19.148 +03 [5480] LOG:  database system is ready to accept connections
+2025-10-13 22:15:19.108 +03 [43296] LOG:  checkpoint starting: time
+2025-10-13 22:15:22.774 +03 [43296] LOG:  checkpoint complete: wrote 36 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.623 s, sync=0.019 s, total=3.668 s; sync files=10, longest=0.003 s, average=0.002 s; distance=184 kB, estimate=184 kB; lsn=0/15A62B8, redo lsn=0/15A6280
+2025-10-13 22:30:19.831 +03 [43296] LOG:  checkpoint starting: time
+2025-10-13 22:30:29.214 +03 [40928] FATAL:  password authentication failed for user "postgres"
+2025-10-13 22:30:29.214 +03 [40928] DETAIL:  Connection matched file "C:/Users/NTC/Desktop/Django-webapp/Django-webapp/pet_adoption/pgdata/pg_hba.conf" line 115: "host    all             all             127.0.0.1/32            scram-sha-256"
+2025-10-13 22:32:07.574 +03 [43296] LOG:  checkpoint complete: wrote 972 buffers (5.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=107.363 s, sync=0.349 s, total=107.744 s; sync files=367, longest=0.004 s, average=0.001 s; distance=4597 kB, estimate=4597 kB; lsn=0/1AB52C0, redo lsn=0/1A239B0
+2025-10-13 22:55:20.283 +03 [43296] LOG:  checkpoint starting: time
+2025-10-13 22:55:37.083 +03 [43296] LOG:  checkpoint complete: wrote 115 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=15.955 s, sync=0.072 s, total=17.080 s; sync files=63, longest=0.003 s, average=0.002 s; distance=583 kB, estimate=4196 kB; lsn=0/1AB59B8, redo lsn=0/1AB5980
+2025-10-13 23:00:20.184 +03 [43296] LOG:  checkpoint starting: time
+2025-10-13 23:00:21.604 +03 [43296] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.167 s, sync=0.012 s, total=1.440 s; sync files=8, longest=0.002 s, average=0.002 s; distance=1 kB, estimate=3776 kB; lsn=0/1AB60E0, redo lsn=0/1AB60A8
+2025-10-13 23:04:01.515 +03 [41092] ERROR:  character with byte sequence 0xd8 0xa8 in encoding "UTF8" has no equivalent in encoding "WIN1252"
+2025-10-13 23:05:20.674 +03 [43296] LOG:  checkpoint starting: time
+2025-10-13 23:05:25.506 +03 [43296] LOG:  checkpoint complete: wrote 24 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.227 s, sync=0.041 s, total=4.866 s; sync files=20, longest=0.005 s, average=0.003 s; distance=5 kB, estimate=3399 kB; lsn=0/1AB7578, redo lsn=0/1AB7540
+2025-10-13 23:10:20.523 +03 [43296] LOG:  checkpoint starting: time
+2025-10-13 23:10:21.329 +03 [43296] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.757 s, sync=0.018 s, total=0.810 s; sync files=8, longest=0.004 s, average=0.003 s; distance=4 kB, estimate=3060 kB; lsn=0/1AB88B0, redo lsn=0/1AB8878

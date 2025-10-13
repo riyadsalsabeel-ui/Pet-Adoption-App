@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Adoption Requests</h2>
+<div class="table-card">
+  <table>
+    <thead>
+      <tr><th>Pet</th><th>Status</th><th>Submitted</th></tr>
+    </thead>
+    <tbody>
+      {% for r in requests %}
+        <tr>
+          <td><a href="{% url 'core:animal_detail' r.animal.pk %}">{{ r.animal.name }}</a></td>
+          <td>{{ r.status }}</td>
+          <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td class="empty-state" colspan="3">You have not submitted any adoption requests yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

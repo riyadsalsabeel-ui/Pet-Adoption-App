@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Adopt {{ animal.name }}</h2>
+<p>Send a short message to let us know why you would be a great match.</p>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit Request</button>
+</form>
+{% endblock %}
