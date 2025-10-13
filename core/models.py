@@ -35,7 +35,7 @@ class AdoptionRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user", "animal")  # prevent duplicate requests by same user for same animal
+        unique_together = ("user", "animal")  
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
