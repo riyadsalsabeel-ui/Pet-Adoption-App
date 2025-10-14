@@ -8,7 +8,7 @@
     <li>Age: {{ animal.age }}</li>
     <li>Status: <strong>{{ animal.status }}</strong></li>
   </ul>
-  <p>{{ animal.description }}</p>
+  <p>{{ animal.description }}</p> 
 
   {% if confirm_delete %}
     <form method="post" action="{% url 'core:animal_delete' animal.pk %}">
