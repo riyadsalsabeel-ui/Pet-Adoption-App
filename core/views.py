@@ -79,7 +79,7 @@ class CozyLoginView(LoginView):
 def cozy_logout(request: HttpRequest) -> HttpResponse:
     logout(request)
     messages.success(request, "You are logged out. See you soon!")
-    return render(request, "registration/logged_out.html")
+    return render(request, "registration/logged_out.html") 
 
 
 def _can_manage_animal(animal: Animal, user) -> bool:
