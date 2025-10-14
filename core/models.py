@@ -8,7 +8,7 @@ class AnimalStatus(models.TextChoices):
 
 class Animal(models.Model):
     name = models.CharField(max_length=100)
-    type = models.CharField(max_length=50)  # e.g., Dog, Cat, Bird
+    type = models.CharField(max_length=50)  
     age = models.PositiveIntegerField()
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to="animals/", blank=True, null=True)
