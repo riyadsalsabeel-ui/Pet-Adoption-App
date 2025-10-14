@@ -290,4 +290,4 @@ def manage_requests(request: HttpRequest) -> HttpResponse:
         request,
         "requests/manage.html",
         {"requests": requests_qs},
-    )
+    ) 
