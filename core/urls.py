@@ -14,5 +14,6 @@ urlpatterns = [
     path("animal/<int:pk>/delete/", views.animal_delete, name="animal_delete"),
     path("adopt/<int:animal_id>/", views.request_create, name="request_create"),
     path("my-requests/", views.my_requests, name="my_requests"),
+    path("manage/animals/", views.animal_manage_list, name="animal_manage_list"),
     path("manage/requests/", views.manage_requests, name="manage_requests"),
 ]

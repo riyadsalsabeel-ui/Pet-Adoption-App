@@ -4,7 +4,7 @@
   <h2>{{ animal.name }}</h2>
   {% if animal.image %}<img src="{{ animal.image.url }}" alt="{{ animal.name }}">{% endif %}
   <ul>
-    <li>Type: {{ animal.type|title }}</li>
+    <li>Type: {{ animal.type }}</li>
     <li>Age: {{ animal.age }}</li>
     <li>Status: <strong>{{ animal.status }}</strong></li>
   </ul>

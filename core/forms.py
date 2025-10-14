@@ -2,11 +2,10 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .constants import ANIMAL_TYPE_CHOICES
 from .models import Animal, AdoptionRequest
 
 class AnimalForm(forms.ModelForm):
-    type = forms.ChoiceField(choices=ANIMAL_TYPE_CHOICES, label="Type")
+    type = forms.CharField(label="Type", max_length=50, help_text="Enter the species or breed name.")
 
     class Meta:
         model = Animal
@@ -14,12 +13,13 @@ class AnimalForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        initial_type = self.initial.get("type")
-        if initial_type:
-            self.initial["type"] = initial_type.lower()
+        self.fields["type"].widget.attrs.update({"placeholder": "e.g. Cat or Arabic name"})
 
     def clean_type(self):
-        return self.cleaned_data["type"].lower()
+        value = (self.cleaned_data.get("type") or "").strip()
+        if not value:
+            raise forms.ValidationError("Please provide an animal type.")
+        return value
 
 class AdoptionRequestForm(forms.ModelForm):
     class Meta:

@@ -7,7 +7,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .constants import ANIMAL_TYPE_KEYS
 from .forms import AdoptionRequestForm, AnimalForm, SignUpForm
 from .models import AdoptionRequest, Animal, AnimalStatus, RequestStatus
 
@@ -21,8 +20,9 @@ def home(request: HttpRequest) -> HttpResponse:
         output_field=IntegerField(),
     )
     animals = Animal.objects.all().annotate(status_priority=status_priority).order_by("status_priority", "-created_at")
-    requested_type = (request.GET.get("type") or "").strip().lower()
-    if requested_type and requested_type != "all":
+    requested_type = (request.GET.get("type") or "").strip()
+    normalized_requested_type = requested_type.lower()
+    if requested_type and normalized_requested_type != "all":
         animals = animals.filter(type__iexact=requested_type)
 
     if request.user.is_authenticated:
@@ -41,10 +41,17 @@ def home(request: HttpRequest) -> HttpResponse:
 
     request_form = AdoptionRequestForm()
 
+    available_types = list(
+        Animal.objects.order_by("type").values_list("type", flat=True).distinct()
+    )
+    type_options = ["all", *[t for t in available_types if t]]
+    if requested_type and normalized_requested_type != "all" and requested_type not in type_options:
+        type_options.append(requested_type)
+
     context = {
         "animals": animals,
-        "filter_type": requested_type or "all",
-        "type_options": ["all", *ANIMAL_TYPE_KEYS],
+        "filter_type": "all" if not requested_type or normalized_requested_type == "all" else requested_type,
+        "type_options": type_options,
         "request_form": request_form,
     }
     return render(request, "animals/list.html", context)
@@ -101,6 +108,16 @@ def animal_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "can_manage": _can_manage_animal(animal, request.user),
     }
     return render(request, "animals/detail.html", context)
+
+
+@login_required
+def animal_manage_list(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:
+        messages.error(request, "Only staff members can manage animals.")
+        return redirect("core:home")
+
+    animals = Animal.objects.select_related("created_by").order_by("-created_at")
+    return render(request, "animals/manage_list.html", {"animals": animals})
 
 
 @login_required

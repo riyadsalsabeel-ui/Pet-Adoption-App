@@ -25,6 +25,7 @@
     {% if user.is_authenticated %}
       {% if user.is_staff %}
         <a href="{% url 'core:manage_requests' %}">Manage Requests</a>
+        <a href="{% url 'core:animal_manage_list' %}">Manage Animals</a>
         <a href="{% url 'core:animal_create' %}">Add Animal</a>
       {% else %}
         <a href="{% url 'core:my_requests' %}">My Requests</a>
@@ -48,6 +49,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector("[data-nav-toggle]");
   const menu = document.querySelector("[data-nav-menu]");
+  document.body.classList.remove("modal-open");
   if (!toggle || !menu) {
     return;
   }
@@ -57,6 +59,12 @@ document.addEventListener("DOMContentLoaded", () => {
     menu.classList.toggle("is-open", !expanded);
     toggle.textContent = expanded ? "Menu" : "Close";
   });
+});
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    document.body.classList.remove("modal-open");
+  }
 });
 </script>
 </body>

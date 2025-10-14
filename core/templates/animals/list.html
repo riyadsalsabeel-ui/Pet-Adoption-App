@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Adoptable Pets{% if filter_type %} · {{ filter_type|title }}{% endif %}</h2>
+<h2>Adoptable Pets{% if filter_type and filter_type != 'all' %} - {{ filter_type }}{% endif %}</h2>
 
 <form method="get" class="filter">
   <label for="filter-type">Type</label>
   <select id="filter-type" name="type">
     {% for option in type_options %}
       <option value="{{ option }}" {% if filter_type == option %}selected{% endif %}>
-        {% if option == "all" %}All Pets{% else %}{{ option|title }}{% endif %}
+        {% if option == "all" %}All Pets{% else %}{{ option }}{% endif %}
       </option>
     {% endfor %}
   </select>
@@ -33,7 +33,7 @@
     >
       {% if a.image %}<img src="{{ a.image.url }}" alt="{{ a.name }}">{% endif %}
       <h3>{{ a.name }}</h3>
-      <p>{{ a.type|title }} | {{ a.age }} yrs</p>
+      <p>{{ a.type }} | {{ a.age }} yrs</p>
       <p class="status">{{ a.status }}</p>
     </button>
   {% empty %}
@@ -74,6 +74,14 @@
       {% endif %}
     </div>
   </div>
+  <div class="image-lightbox hidden" data-image-lightbox>
+    <div class="image-lightbox-backdrop" data-lightbox-close></div>
+    <figure class="image-lightbox-frame">
+      <button type="button" class="image-lightbox-close" data-lightbox-close aria-label="Close image">&times;</button>
+      <img src="" alt="" data-lightbox-image>
+      <figcaption class="image-lightbox-caption" data-lightbox-caption></figcaption>
+    </figure>
+  </div>
 </div>
 
 <script>
@@ -94,6 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const descEl = modal.querySelector("[data-modal-description]");
   const imageWrapper = modal.querySelector("[data-modal-image-wrapper]");
   const imageEl = modal.querySelector("[data-modal-image]");
+  const lightbox = modal.querySelector("[data-image-lightbox]");
+  const lightboxImage = lightbox ? lightbox.querySelector("[data-lightbox-image]") : null;
+  const lightboxCaption = lightbox ? lightbox.querySelector("[data-lightbox-caption]") : null;
+  const lightboxCloseTargets = lightbox ? lightbox.querySelectorAll("[data-lightbox-close]") : [];
   const requestForm = modal.querySelector("[data-request-form]");
   const requestHint = modal.querySelector("[data-request-hint]");
   const adoptCta = modal.querySelector("[data-adopt-cta]");
@@ -107,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const openModal = (card) => {
+    closeLightbox();
     nameEl.textContent = card.dataset.animalName;
     statusEl.textContent = card.dataset.animalStatus;
     typeEl.textContent = card.dataset.animalType;
@@ -118,10 +131,16 @@ document.addEventListener("DOMContentLoaded", () => {
       imageEl.src = imgSrc;
       imageEl.alt = card.dataset.animalName;
       imageWrapper.classList.remove("hidden");
+      imageEl.setAttribute("tabindex", "0");
+      imageEl.setAttribute("role", "button");
+      imageEl.setAttribute("aria-label", "View larger image");
     } else {
       imageEl.src = "";
       imageEl.alt = "";
       imageWrapper.classList.add("hidden");
+      imageEl.removeAttribute("tabindex");
+      imageEl.removeAttribute("role");
+      imageEl.removeAttribute("aria-label");
     }
 
     if (isAuth && !isStaff && requestForm) {
@@ -159,8 +178,35 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const closeModal = () => {
+    closeLightbox();
     modal.classList.add("hidden");
     body.classList.remove("modal-open");
+  };
+
+  const closeLightbox = () => {
+    if (!lightbox) {
+      return;
+    }
+    lightbox.classList.add("hidden");
+    if (lightboxImage) {
+      lightboxImage.src = "";
+      lightboxImage.alt = "";
+    }
+    if (lightboxCaption) {
+      lightboxCaption.textContent = "";
+    }
+  };
+
+  const openLightbox = () => {
+    if (!lightbox || !lightboxImage || !imageEl || !imageEl.src) {
+      return;
+    }
+    lightboxImage.src = imageEl.src;
+    lightboxImage.alt = imageEl.alt;
+    if (lightboxCaption) {
+      lightboxCaption.textContent = nameEl.textContent || "";
+    }
+    lightbox.classList.remove("hidden");
   };
 
   cards.forEach((card) => {
@@ -177,7 +223,25 @@ document.addEventListener("DOMContentLoaded", () => {
     element.addEventListener("click", closeModal);
   });
 
+  lightboxCloseTargets.forEach((element) => {
+    element.addEventListener("click", closeLightbox);
+  });
+
+  if (imageEl && lightbox) {
+    imageEl.addEventListener("click", openLightbox);
+    imageEl.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openLightbox();
+      }
+    });
+  }
+
   document.addEventListener("keydown", (event) => {
+    if (!modal.classList.contains("hidden") && event.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) {
+      closeLightbox();
+      return;
+    }
     if (event.key === "Escape" && !modal.classList.contains("hidden")) {
       closeModal();
     }

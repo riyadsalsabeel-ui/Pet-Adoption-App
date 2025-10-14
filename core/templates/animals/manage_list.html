@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="admin-section">
+  <header class="admin-header">
+    <h2>Manage Animals</h2>
+    <a class="btn" href="{% url 'core:animal_create' %}">Add Animal</a>
+  </header>
+
+  {% if animals %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Age</th>
+          <th>Created</th>
+          <th>Created By</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for animal in animals %}
+          <tr>
+            <td>{{ animal.name }}</td>
+            <td>{{ animal.type }}</td>
+            <td>{{ animal.status }}</td>
+            <td>{{ animal.age }}</td>
+            <td>{{ animal.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{% if animal.created_by %}{{ animal.created_by.username }}{% else %}-{% endif %}</td>
+            <td class="admin-actions">
+              <a class="btn" href="{% url 'core:animal_detail' animal.pk %}">View</a>
+              <a class="btn" href="{% url 'core:animal_update' animal.pk %}">Edit</a>
+              <form method="post" action="{% url 'core:animal_delete' animal.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn danger" onclick="return confirm('Delete this animal?')">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No animals have been added yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
