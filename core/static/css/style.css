@@ -75,7 +75,7 @@ header.nav {
     gap: 2rem;
     padding: 1rem 3rem;
     box-shadow: var(--shadow-sm);
-    animation: slideDown 400ms ease forwards;
+    animation: slideDown 400ms ease forwards; 
 }
 
 .nav-brand {
