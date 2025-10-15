@@ -3,13 +3,13 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS += ['.onrender.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -23,6 +23,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Fixed: Added WhiteNoise here
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -51,21 +52,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "pet_adoption.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "pet_adoption_db"),
-        "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-        # 'NAME': 'animals',
-        # 'USER': 'postgres',
-        # 'PASSWORD': 'salsabeel',
-        # 'HOST': 'localhost',
-        # 'PORT': '5432',
+# Database configuration - only define once!
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    # Production database (Render)
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Local development database
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "pet_adoption_db"),
+            "USER": os.getenv("DB_USER", "postgres"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -79,48 +88,20 @@ TIME_ZONE = os.getenv("TIME_ZONE", "UTC")
 USE_I18N = True
 USE_TZ = True
 
+# Static files configuration
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Added: Required for production
 STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
 
+# WhiteNoise configuration
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-
-MIDDLEWARE+= 'whitenoise.middleware.WhiteNoiseMiddleware',
-ALLOWED_HOSTS += ['.onrender.com','localhost','127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
-
-
-
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=not DEBUG
-        )
-    }
-else:
-    DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('pet_adoption_db'),  # same name as your .env file
-        'USER': 'postgres',
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',  
-        'PORT': '5432',
-    }
-}
-
-
-
-
-
-
-
-
+# Media files configuration
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# CSRF configuration
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
